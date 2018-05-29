@@ -1,16 +1,12 @@
 package io.fotoapparat.result
 
 import io.fotoapparat.capability.Capabilities
-import io.fotoapparat.exception.RecoverableRuntimeException
 import io.fotoapparat.exception.UnableToDecodeBitmapException
 import io.fotoapparat.hardware.executeMainThread
 import io.fotoapparat.hardware.pendingResultExecutor
 import io.fotoapparat.log.Logger
 import io.fotoapparat.parameter.camera.CameraParameters
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.Executor
-import java.util.concurrent.Future
-import java.util.concurrent.FutureTask
+import java.util.concurrent.*
 
 
 /**
@@ -24,13 +20,7 @@ internal constructor(
         private val executor: Executor
 ) {
     private val resultUnsafe: T
-        get() = try {
-            future.get()
-        } catch (e: InterruptedException) {
-            throw RecoverableRuntimeException(e)
-        } catch (e: ExecutionException) {
-            throw RecoverableRuntimeException(e)
-        }
+        get() = future.get()
 
     /**
      * Transforms result from one type to another.
@@ -82,8 +72,12 @@ internal constructor(
                 resultUnsafe.notifyCallbackOnMainThread(callback)
             } catch (e: UnableToDecodeBitmapException) {
                 logger.log("Couldn't decode bitmap from byte array")
-            } catch (e: RecoverableRuntimeException) {
-                logger.log("Couldn't deliver pending result.")
+            } catch (e: InterruptedException) {
+                logger.log("Couldn't deliver pending result: Camera stopped before delivering result.")
+            } catch (e: CancellationException) {
+                logger.log("Couldn't deliver pending result: Camera operation was cancelled.")
+            } catch (e: ExecutionException) {
+                logger.log("Couldn't deliver pending result: Operation failed internally.")
                 callback(null)
             }
         }

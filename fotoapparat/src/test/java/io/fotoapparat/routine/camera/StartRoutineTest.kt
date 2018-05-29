@@ -4,7 +4,11 @@ import android.graphics.SurfaceTexture
 import io.fotoapparat.exception.camera.CameraException
 import io.fotoapparat.hardware.CameraDevice
 import io.fotoapparat.hardware.Device
+import io.fotoapparat.hardware.orientation.Orientation.Horizontal.Landscape
+import io.fotoapparat.hardware.orientation.Orientation.Vertical.Portrait
 import io.fotoapparat.hardware.orientation.OrientationSensor
+import io.fotoapparat.hardware.orientation.OrientationState
+import io.fotoapparat.log.Logger
 import io.fotoapparat.parameter.ScaleType
 import io.fotoapparat.test.testResolution
 import io.fotoapparat.test.willReturn
@@ -12,14 +16,13 @@ import io.fotoapparat.test.willThrow
 import io.fotoapparat.view.CameraRenderer
 import io.fotoapparat.view.Preview
 import io.fotoapparat.view.toPreview
-import kotlinx.coroutines.experimental.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.inOrder
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
+import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -37,6 +40,8 @@ internal class StartRoutineTest {
     @Mock
     lateinit var cameraDevice: CameraDevice
     @Mock
+    lateinit var mockLogger: Logger
+    @Mock
     lateinit var device: Device
 
     lateinit var preview: Preview
@@ -51,7 +56,7 @@ internal class StartRoutineTest {
         // Given
         device.apply {
             getSelectedCamera() willReturn cameraDevice
-            getScreenRotation() willReturn 90
+            getScreenOrientation() willReturn Landscape
             cameraRenderer willReturn cameraViewRenderer
             scaleType willReturn ScaleType.CenterCrop
         }
@@ -72,12 +77,36 @@ internal class StartRoutineTest {
             verify(device).selectCamera()
             verify(cameraDevice).open()
             verify(device).updateCameraConfiguration(cameraDevice)
-            verify(cameraDevice).setDisplayOrientation(90)
+            verify(cameraDevice).setDisplayOrientation(OrientationState(
+                    Portrait,
+                    Landscape
+            ))
             verify(cameraViewRenderer).setScaleType(ScaleType.CenterCrop)
             verify(cameraViewRenderer).setPreviewResolution(testResolution)
             verify(cameraDevice).setDisplaySurface(preview)
             verify(cameraDevice).startPreview()
         }
+    }
+
+    @Test
+    fun `Cannot set display surface while starting`() {
+        // Given
+        device.apply {
+            getSelectedCamera() willReturn cameraDevice
+            getScreenOrientation() willReturn Landscape
+            cameraRenderer willReturn cameraViewRenderer
+            scaleType willReturn ScaleType.CenterCrop
+            logger willReturn mockLogger
+        }
+        cameraDevice.getPreviewResolution() willReturn testResolution
+        cameraDevice.setDisplaySurface(preview) willThrow IOException()
+        cameraViewRenderer.getPreview() willReturn preview
+
+        // When
+        device.start()
+
+        // Then
+        verify(cameraDevice, never()).startPreview()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -112,13 +141,14 @@ internal class StartRoutineTest {
     }
 
     @Test
-    fun `Boot start`() = runBlocking {
+    fun `Boot start`() {
         // Given
-        val hasErrors = AtomicBoolean(false)
+        var hasErrors = false
+
         device.apply {
             hasSelectedCamera() willReturn false
             getSelectedCamera() willReturn cameraDevice
-            getScreenRotation() willReturn 90
+            getScreenOrientation() willReturn Landscape
             cameraRenderer willReturn cameraViewRenderer
             scaleType willReturn ScaleType.CenterCrop
         }
@@ -128,11 +158,11 @@ internal class StartRoutineTest {
         // When
         device.bootStart(
                 orientationSensor,
-                { hasErrors.set(true) }
+                { hasErrors = true }
         )
 
         // Then
-        assertFalse(hasErrors.get())
+        assertFalse(hasErrors)
 
         verify(device).start()
     }

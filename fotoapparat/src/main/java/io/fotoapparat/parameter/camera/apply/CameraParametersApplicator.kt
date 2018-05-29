@@ -12,19 +12,20 @@ import io.fotoapparat.parameter.camera.convert.toCode
  * Applies a new set of [CameraParameters] to existing [Camera.Parameters].
  *
  * @receiver The existing [Camera.Parameters]
- * @param newParameters A new set of [CameraParameters].
+ * @param parameters A new set of [CameraParameters].
  *
  * @return Same [Camera.Parameters] object which was passed, but filled with new parameters.
  */
-internal fun Camera.Parameters.applyNewParameters(newParameters: CameraParameters): Camera.Parameters {
-    newParameters tryApplyInto this
-    return this
+internal fun CameraParameters.applyInto(parameters: Camera.Parameters): Camera.Parameters {
+    this tryApplyInto parameters
+    return parameters
 }
 
 private infix fun CameraParameters.tryApplyInto(parameters: Camera.Parameters) {
     flashMode applyInto parameters
     focusMode applyInto parameters
-    jpegQuality applyInto parameters
+    jpegQuality applyJpegQualityInto parameters
+    exposureCompensation applyExposureCompensationInto parameters
     antiBandingMode applyInto parameters
     previewFpsRange applyInto parameters
     previewResolution applyPreviewInto parameters
@@ -40,8 +41,12 @@ private infix fun FocusMode.applyInto(parameters: Camera.Parameters) {
     parameters.focusMode = toCode()
 }
 
-private infix fun Int.applyInto(parameters: Camera.Parameters) {
+private infix fun Int.applyJpegQualityInto(parameters: Camera.Parameters) {
     parameters.jpegQuality = this
+}
+
+private infix fun Int.applyExposureCompensationInto(parameters: Camera.Parameters) {
+    parameters.exposureCompensation = this
 }
 
 private infix fun AntiBandingMode.applyInto(parameters: Camera.Parameters) {

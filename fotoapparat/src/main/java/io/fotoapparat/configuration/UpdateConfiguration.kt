@@ -10,6 +10,7 @@ data class UpdateConfiguration(
         override val flashMode: FlashSelector? = null,
         override val focusMode: FocusModeSelector? = null,
         override val jpegQuality: QualitySelector? = null,
+        override val exposureCompensation: ExposureSelector? = null,
         override val frameProcessor: FrameProcessor? = null,
         override val previewFpsRange: FpsRangeSelector? = null,
         override val antiBandingMode: AntiBandingModeSelector? = null,
@@ -26,55 +27,61 @@ data class UpdateConfiguration(
         private var configuration = UpdateConfiguration()
 
         fun flash(selector: FlashSelector): Builder = apply {
-            configuration.copy(
+            configuration = configuration.copy(
                     flashMode = selector
             )
         }
 
         fun focusMode(selector: FocusModeSelector): Builder = apply {
-            configuration.copy(
+            configuration = configuration.copy(
                     focusMode = selector
             )
         }
 
         fun previewFpsRange(selector: FpsRangeSelector): Builder = apply {
-            configuration.copy(
+            configuration = configuration.copy(
                     previewFpsRange = selector
             )
         }
 
         fun sensorSensitivity(selector: SensorSensitivitySelector): Builder = apply {
-            configuration.copy(
+            configuration = configuration.copy(
                     sensorSensitivity = selector
             )
         }
 
         fun antiBandingMode(selector: AntiBandingModeSelector): Builder = apply {
-            configuration.copy(
+            configuration = configuration.copy(
                     antiBandingMode = selector
             )
         }
 
         fun jpegQuality(selector: QualitySelector): Builder = apply {
-            configuration.copy(
+            configuration = configuration.copy(
                     jpegQuality = selector
             )
         }
 
+        fun exposureCompensation(selector: ExposureSelector): Builder = apply {
+            configuration = configuration.copy(
+                    exposureCompensation = selector
+            )
+        }
+
         fun previewResolution(selector: ResolutionSelector): Builder = apply {
-            configuration.copy(
+            configuration = configuration.copy(
                     previewResolution = selector
             )
         }
 
         fun photoResolution(selector: ResolutionSelector): Builder = apply {
-            configuration.copy(
+            configuration = configuration.copy(
                     pictureResolution = selector
             )
         }
 
         fun frameProcessor(frameProcessor: FrameProcessor): Builder = apply {
-            configuration.copy(
+            configuration = configuration.copy(
                     frameProcessor = frameProcessor
             )
         }

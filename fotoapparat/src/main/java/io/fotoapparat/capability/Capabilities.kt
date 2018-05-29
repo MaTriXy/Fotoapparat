@@ -10,13 +10,14 @@ import io.fotoapparat.util.wrap
  * Sensor sensitivities is not guaranteed to always contain a value.
  */
 data class Capabilities(
-        val canZoom: Boolean,
+        val zoom: Zoom,
         val flashModes: Set<Flash>,
         val focusModes: Set<FocusMode>,
         val canSmoothZoom: Boolean,
         val maxFocusAreas: Int,
         val maxMeteringAreas: Int,
         val jpegQualityRange: IntRange,
+        val exposureCompensationRange: IntRange,
         val previewFpsRanges: Set<FpsRange>,
         val antiBandingModes: Set<AntiBandingMode>,
         val pictureResolutions: Set<Resolution>,
@@ -35,13 +36,14 @@ data class Capabilities(
 
     override fun toString(): String {
         return "Capabilities" + lineSeparator +
-                "canZoom:" + canZoom.wrap() +
+                "zoom:" + zoom.wrap() +
                 "flashModes:" + flashModes.wrap() +
                 "focusModes:" + focusModes.wrap() +
                 "canSmoothZoom:" + canSmoothZoom.wrap() +
                 "maxFocusAreas:" + maxFocusAreas.wrap() +
                 "maxMeteringAreas:" + maxMeteringAreas.wrap() +
                 "jpegQualityRange:" + jpegQualityRange.wrap() +
+                "exposureCompensationRange:" + exposureCompensationRange.wrap() +
                 "antiBandingModes:" + antiBandingModes.wrap() +
                 "previewFpsRanges:" + previewFpsRanges.wrap() +
                 "pictureResolutions:" + pictureResolutions.wrap() +

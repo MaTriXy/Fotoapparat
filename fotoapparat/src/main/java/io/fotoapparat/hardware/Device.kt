@@ -4,15 +4,16 @@ package io.fotoapparat.hardware
 
 import android.hardware.Camera
 import io.fotoapparat.characteristic.getCharacteristics
+import io.fotoapparat.concurrent.CameraExecutor
 import io.fotoapparat.configuration.CameraConfiguration
 import io.fotoapparat.configuration.Configuration
 import io.fotoapparat.exception.camera.UnsupportedLensException
 import io.fotoapparat.hardware.display.Display
+import io.fotoapparat.hardware.orientation.Orientation
 import io.fotoapparat.log.Logger
 import io.fotoapparat.parameter.ScaleType
 import io.fotoapparat.parameter.camera.CameraParameters
 import io.fotoapparat.parameter.camera.provide.getCameraParameters
-import io.fotoapparat.preview.Frame
 import io.fotoapparat.selector.LensPositionSelector
 import io.fotoapparat.util.FrameProcessor
 import io.fotoapparat.view.CameraRenderer
@@ -24,11 +25,12 @@ import kotlinx.coroutines.experimental.CompletableDeferred
  * Phone.
  */
 internal open class Device(
-        private val logger: Logger,
+        internal open val logger: Logger,
         private val display: Display,
-        open val scaleType: ScaleType,
-        open val cameraRenderer: CameraRenderer,
-        val focusPointSelector: FocalPointSelector?,
+        internal open val scaleType: ScaleType,
+        internal open val cameraRenderer: CameraRenderer,
+        internal val focusPointSelector: FocalPointSelector?,
+        internal val executor: CameraExecutor,
         numberOfCameras: Int = Camera.getNumberOfCameras(),
         initialConfiguration: CameraConfiguration, initialLensPositionSelector: LensPositionSelector
 ) {
@@ -104,9 +106,11 @@ internal open class Device(
     open fun hasSelectedCamera() = selectedCameraDevice.isCompleted
 
     /**
-     * @return rotation of the screen in degrees.
+     * @return Orientation of the screen.
      */
-    open fun getScreenRotation(): Int = display.getRotation()
+    open fun getScreenOrientation(): Orientation {
+        return display.getOrientation()
+    }
 
     /**
      * Updates the desired from the user camera lens position.
@@ -163,6 +167,7 @@ internal fun updateConfiguration(
 ) = CameraConfiguration(
         flashMode = newConfiguration.flashMode ?: savedConfiguration.flashMode,
         focusMode = newConfiguration.focusMode ?: savedConfiguration.focusMode,
+        exposureCompensation = newConfiguration.exposureCompensation ?: savedConfiguration.exposureCompensation,
         frameProcessor = newConfiguration.frameProcessor ?: savedConfiguration.frameProcessor,
         previewFpsRange = newConfiguration.previewFpsRange ?: savedConfiguration.previewFpsRange,
         sensorSensitivity = newConfiguration.sensorSensitivity

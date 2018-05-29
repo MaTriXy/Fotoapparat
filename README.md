@@ -5,7 +5,7 @@
 
 ![ ](sample/src/main/res/mipmap-xxxhdpi/ic_launcher.png)
 
-Camera API in Android is hard. Having 2 different API for new and old Camera does not make things any easier. But fret not, that is your lucky day! After several years of working with Camera we came up with Fotoapparat.
+Camera API in Android is hard. Having 2 different API for new and old Camera does not make things any easier. But fret not, that is your lucky day! After several years of working with Camera, we came up with Fotoapparat.
 
 What it provides:
 - Camera API which does not allow you to shoot yourself in the foot.
@@ -83,9 +83,9 @@ override fun onStop() {
 }
 ```
 
-### Take picture
+### Take a picture
 
-Finally we are ready to take picture. You have various options.
+Finally, we are ready to take a picture. You have various options.
 
 ```kotlin
 val photoResult = fotoapparat.takePicture()
@@ -93,7 +93,7 @@ val photoResult = fotoapparat.takePicture()
 // Asynchronously saves photo to file
 photoResult.saveToFile(someFile)
  
-// Asynchronously converts photo to bitmap and returns result on main thread
+// Asynchronously converts photo to bitmap and returns the result on the main thread
 photoResult
     .toBitmap()
     .whenAvailable { bitmapPhoto ->
@@ -103,7 +103,7 @@ photoResult
             imageView.setRotation(-bitmapPhoto.rotationDegrees)
     }
     
-// Of course you can also get a photo in a blocking way. Do not do it on main thread though.
+// Of course, you can also get a photo in a blocking way. Do not do it on the main thread though.
 val result = photoResult.toBitmap().await()
  
 // Convert asynchronous events to RxJava 1.x/2.x types. 
@@ -130,7 +130,7 @@ fotoapparat.updateConfiguration(
 )
 ```
 
-Or alternatively you may provide updates on an existing full configuration. 
+Or alternatively, you may provide updates on an existing full configuration. 
 
 ```kotlin
 val configuration = CameraConfiguration(
@@ -166,20 +166,35 @@ repositories {
   maven { url 'https://jitpack.io' }
 }
  
-compile 'io.fotoapparat.fotoapparat:library:2.1.2'
+implementation 'io.fotoapparat.fotoapparat:library:2.2.0'
 ```
 
 Camera permission will be automatically added to your `AndroidManifest.xml`. Do not forget to request this permission on Marshmallow and higher.
 
+#### Snapshot versions
+
+If you like to test and try the latest added features & bugfixes you can use the `-SNAPSHOT` version.
+Gradle will download & cache the latest snapshot version, so be sure to delete the cache if you want to try a newer `snapshot` version than the downloaded/cached one.
+
+```groovy
+implementation 'io.fotoapparat:fotoapparat:library:-SNAPSHOT'
+```
+
 ## Face detection
 
 Optionally, you can check out our other library which adds face detection capabilities - [FaceDetector](https://github.com/Fotoapparat/FaceDetector).
+
+## Videoapparat
+
+For video recording possibility, check out our premium library - [Videoapparat](https://github.com/Fotoapparat/Videoapparat)
+
 
 ## Credits
 
 We want to say thanks to [Mark Murphy](https://github.com/commonsguy) for the awesome job he did with [CWAC-Camera](https://github.com/commonsguy/cwac-camera). We were using his library for a couple of years and now we feel that Fotoapparat is a next step in the right direction.
 
 We also want to say many thanks to [Leander Lenzing](http://leanderlenzing.com/) for the amazing icon. Don't forget to follow his work in [dribbble](https://dribbble.com/leanderlenzing).
+
 
 ## License
 

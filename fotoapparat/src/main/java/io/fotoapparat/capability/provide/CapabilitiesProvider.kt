@@ -14,13 +14,14 @@ internal fun Camera.getCapabilities() = SupportedParameters(parameters).getCapab
 
 private fun SupportedParameters.getCapabilities(): Capabilities {
     return Capabilities(
-            canZoom = supportedZoom,
+            zoom = supportedZoom,
             flashModes = flashModes.extract { it.toFlash() },
             focusModes = focusModes.extract { it.toFocusMode() },
             maxFocusAreas = maxNumFocusAreas,
             canSmoothZoom = supportedSmoothZoom,
             maxMeteringAreas = maxNumMeteringAreas,
             jpegQualityRange = jpegQualityRange,
+            exposureCompensationRange = exposureCompensationRange,
             antiBandingModes = supportedAutoBandingModes.extract(String::toAntiBandingMode),
             sensorSensitivities = sensorSensitivities.toSet(),
             previewFpsRanges = supportedPreviewFpsRanges.extract { it.toFpsRange() },

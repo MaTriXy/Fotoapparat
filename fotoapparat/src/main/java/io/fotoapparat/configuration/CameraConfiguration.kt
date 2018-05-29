@@ -6,6 +6,7 @@ import io.fotoapparat.preview.FrameProcessor as FrameProcessorJava
 
 
 private const val DEFAULT_JPEG_QUALITY = 90
+private const val DEFAULT_EXPOSURE_COMPENSATION = 0
 
 /**
  * A camera configuration which has all it's selectors defined.
@@ -15,9 +16,11 @@ data class CameraConfiguration(
         override val focusMode: FocusModeSelector = firstAvailable(
                 continuousFocusPicture(),
                 autoFocus(),
-                fixed()
+                fixed(),
+                infinity()
         ),
         override val jpegQuality: QualitySelector = manualJpegQuality(DEFAULT_JPEG_QUALITY),
+        override val exposureCompensation: ExposureSelector = manualExposure(DEFAULT_EXPOSURE_COMPENSATION),
         override val frameProcessor: FrameProcessor = {},
         override val previewFpsRange: FpsRangeSelector = highestFps(),
         override val antiBandingMode: AntiBandingModeSelector = firstAvailable(
@@ -56,9 +59,9 @@ data class CameraConfiguration(
             )
         }
 
-        fun sensorSensitivity(selector: SensorSensitivitySelector): Builder = apply {
+        fun exposureCompensation(selector: ExposureSelector): Builder = apply {
             cameraConfiguration = cameraConfiguration.copy(
-                    sensorSensitivity = selector
+                    exposureCompensation = selector
             )
         }
 
@@ -71,6 +74,12 @@ data class CameraConfiguration(
         fun jpegQuality(selector: QualitySelector): Builder = apply {
             cameraConfiguration.copy(
                     jpegQuality = selector
+            )
+        }
+
+        fun sensorSensitivity(selector: SensorSensitivitySelector): Builder = apply {
+            cameraConfiguration = cameraConfiguration.copy(
+                    sensorSensitivity = selector
             )
         }
 
