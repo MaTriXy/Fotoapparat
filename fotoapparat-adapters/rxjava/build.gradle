@@ -11,9 +11,9 @@ android {
     defaultConfig {
         minSdkVersion versions.sdk.minimum
         targetSdkVersion versions.sdk.target
-
-        archivesBaseName = 'adapter-rxjava'
     }
+
+    archivesBaseName = 'adapter-rxjava'
 }
 
 dependencies {
@@ -25,3 +25,15 @@ dependencies {
     testImplementation "io.reactivex:rxjava:${versions.rx.rxJava1}"
     testImplementation "junit:junit:${versions.test.junit}"
 }
+
+ext {
+    bintrayName = 'adapter-rxjava'
+
+    libraryName = 'Fotoapparat Adapters - RxJava'
+    artifact = 'adapter-rxjava'
+    libraryVersion = artifactVersion
+
+    libraryDescription = 'RxJava1 adapter for Fotoapparat.'
+}
+
+apply from: '../../deploy.gradle'

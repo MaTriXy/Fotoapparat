@@ -4,7 +4,6 @@ import io.fotoapparat.selector.*
 import io.fotoapparat.util.FrameProcessor
 import io.fotoapparat.preview.FrameProcessor as FrameProcessorJava
 
-
 private const val DEFAULT_JPEG_QUALITY = 90
 private const val DEFAULT_EXPOSURE_COMPENSATION = 0
 
@@ -21,7 +20,7 @@ data class CameraConfiguration(
         ),
         override val jpegQuality: QualitySelector = manualJpegQuality(DEFAULT_JPEG_QUALITY),
         override val exposureCompensation: ExposureSelector = manualExposure(DEFAULT_EXPOSURE_COMPENSATION),
-        override val frameProcessor: FrameProcessor = {},
+        override val frameProcessor: FrameProcessor? = null,
         override val previewFpsRange: FpsRangeSelector = highestFps(),
         override val antiBandingMode: AntiBandingModeSelector = firstAvailable(
                 auto(),
@@ -95,9 +94,9 @@ data class CameraConfiguration(
             )
         }
 
-        fun frameProcessor(frameProcessor: FrameProcessorJava): Builder = apply {
+        fun frameProcessor(frameProcessor: FrameProcessorJava?): Builder = apply {
             cameraConfiguration = cameraConfiguration.copy(
-                    frameProcessor = frameProcessor::process
+                    frameProcessor = frameProcessor?.let { it::process }
             )
         }
 

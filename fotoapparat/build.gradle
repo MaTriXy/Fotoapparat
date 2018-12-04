@@ -4,8 +4,6 @@ apply plugin: 'kotlin-android'
 
 group = 'io.fotoapparat'
 
-kotlin.experimental.coroutines 'enable'
-
 android {
     buildToolsVersion versions.android.buildTools
     compileSdkVersion versions.sdk.target
@@ -13,8 +11,6 @@ android {
     defaultConfig {
         minSdkVersion versions.sdk.minimum
         targetSdkVersion versions.sdk.target
-
-        archivesBaseName = 'library'
     }
 
     buildTypes {
@@ -29,12 +25,24 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:support-annotations:${versions.android.support}"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
-    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.21'
+    implementation "androidx.annotation:annotation:${versions.android.annotation}"
+    implementation "androidx.exifinterface:exifinterface:${versions.android.exifinterface}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.0'
 
     testImplementation "junit:junit:${versions.test.junit}"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${versions.kotlin}"
     testImplementation "org.mockito:mockito-core:${versions.test.mockito}"
-    testImplementation "commons-io:commons-io:${versions.util.commons}"
 }
+
+ext {
+    bintrayName = 'fotoapparat'
+
+    libraryName = 'Fotoapparat'
+    artifact = 'fotoapparat'
+    libraryVersion = artifactVersion
+
+    libraryDescription = 'Camera library for Android with a more user-friendly API.'
+}
+
+apply from: '../deploy.gradle'
