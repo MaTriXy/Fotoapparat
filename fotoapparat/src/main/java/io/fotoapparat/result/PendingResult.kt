@@ -1,6 +1,7 @@
 package io.fotoapparat.result
 
 import io.fotoapparat.capability.Capabilities
+import io.fotoapparat.concurrent.ensureBackgroundThread
 import io.fotoapparat.exception.UnableToDecodeBitmapException
 import io.fotoapparat.hardware.executeMainThread
 import io.fotoapparat.hardware.pendingResultExecutor
@@ -19,7 +20,10 @@ internal constructor(
         private val executor: Executor
 ) {
     private val resultUnsafe: T
-        get() = future.get()
+        get() {
+            ensureBackgroundThread()
+            return future.get()
+        }
 
     /**
      * Transforms result from one type to another.
@@ -68,16 +72,24 @@ internal constructor(
     fun whenAvailable(callback: (T?) -> Unit) {
         executor.execute {
             try {
-                resultUnsafe.notifyCallbackOnMainThread(callback)
+                val result = resultUnsafe
+                notifyOnMainThread {
+                    callback(result)
+                }
             } catch (e: UnableToDecodeBitmapException) {
                 logger.log("Couldn't decode bitmap from byte array")
+                notifyOnMainThread {
+                    callback(null)
+                }
             } catch (e: InterruptedException) {
                 logger.log("Couldn't deliver pending result: Camera stopped before delivering result.")
             } catch (e: CancellationException) {
                 logger.log("Couldn't deliver pending result: Camera operation was cancelled.")
             } catch (e: ExecutionException) {
                 logger.log("Couldn't deliver pending result: Operation failed internally.")
-                callback(null)
+                notifyOnMainThread {
+                    callback(null)
+                }
             }
         }
     }
@@ -105,9 +117,9 @@ internal constructor(
 
 }
 
-private fun <T> T.notifyCallbackOnMainThread(callback: (T) -> Unit) {
+private fun notifyOnMainThread(function: () -> Unit) {
     executeMainThread {
-        callback(this)
+        function()
     }
 }
 
